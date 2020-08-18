@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using webapi.Models;
 
@@ -6,13 +8,20 @@ using webapi.Models;
 //http://localhost:5000
 
 [Route("categories")]
+
+//Foi incluido os Tasks apartir da versão 6, para trabalhar de forma assincrona
+//não trava a thread principal da aplicação
+//tornando a aplicação muito mais rapida - programação paralela
 public class CategoryController : ControllerBase{
 
     //por padrão se eu não espor o verbo, automaticamente ele é do tipo get
     [HttpGet]
     [Route("")]
-    public string Get(){
-        return "GET";
+    //ActionResult => traz o resultado no formato que a tela espera
+    //async => basicamente cria threads paralelas para a execução, não travando assim a aplicação
+    //O Task pode receber uma tipagem, no caso foi o tipo Category
+    public async Task<ActionResult<List<Category>>> Get(){
+        return new List<Category>();
     }
 
      [HttpGet]
@@ -20,27 +29,27 @@ public class CategoryController : ControllerBase{
      //:int => estou restringindo o que esta entrando como parametro, nesse caso se entrar um string, a api trará um 404 ao invés de buscar o solicitado
     [Route("{id:int}")]
     //para passar para o metodo é so criar um parâmetro
-    public string GetById(int id){
-        return id.ToString();
+    public async Task<ActionResult<Category>> GetById(int id){
+        return new Category();
     }
     
      [HttpPost]
     [Route("")]
-    public Category Post([FromBody]Category model){
-        return model;
+    public async Task<ActionResult<List<Category>>> Post([FromBody]Category model){
+        return Ok(model);
     }
 
      [HttpPut]
     [Route("{id:int}")]
-    public Category Put(int id, [FromBody] Category model){
+    public async Task<ActionResult<List<Category>>> Put(int id, [FromBody] Category model){
         if(model.Id == id)
-            return model;
-        return null;
+            return Ok(model);
+        return NotFound();
     }
 
-     [HttpGet]
+     [HttpDelete]
     [Route("{id:int}")]
-    public string Delete(){
-        return "DELETE";
+    public async Task<ActionResult<List<Category>>> Delete(){
+        return Ok();
     }
 }
