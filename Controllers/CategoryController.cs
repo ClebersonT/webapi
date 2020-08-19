@@ -9,7 +9,7 @@ using webapi.Models;
 
 [Route("categories")]
 
-//Foi incluido os Tasks apartir da versão 6, para trabalhar de forma assincrona
+//Foi incluido os Tasks apartir da versão 6, para tra balhar de forma assincrona
 //não trava a thread principal da aplicação
 //tornando a aplicação muito mais rapida - programação paralela
 public class CategoryController : ControllerBase{
@@ -33,18 +33,28 @@ public class CategoryController : ControllerBase{
         return new Category();
     }
     
-     [HttpPost]
+    [HttpPost]
     [Route("")]
     public async Task<ActionResult<List<Category>>> Post([FromBody]Category model){
+
+        //verificando se as validações que foram passadas no model estão de acordo
+        if(!ModelState.IsValid)
+            return BadRequest(ModelState);
         return Ok(model);
     }
 
      [HttpPut]
     [Route("{id:int}")]
     public async Task<ActionResult<List<Category>>> Put(int id, [FromBody] Category model){
-        if(model.Id == id)
-            return Ok(model);
-        return NotFound();
+        //verifica se Id informado é o mesmo do modelo
+        if (id != model.Id)
+            //objetos dinâmicos dentro do C#, ao inves de só mostrar um 404, posso exibir uma mensagem na tela
+            return NotFound(new { message = "Categoria não encontrada"});
+        //verifica se os dados são validos
+        if(!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        return Ok();
     }
 
      [HttpDelete]
