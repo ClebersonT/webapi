@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using webapi.Data;
 
 namespace webapi
 {
@@ -19,6 +21,15 @@ namespace webapi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            //informara a aplicação que eu tenho um DataContext
+            // e posso informar o banco que eu vou utilizar => postgres, mysqlServer etc
+            services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
+            /*tornar esse DataContext disponivel aos nossos controllers
+            injeção de dependencia
+            O AddScoped irá garantir que irei ter somente 1 DataContext por requisição
+            cada DataContext cria uma conexão com o banco, nesse caso como terei somente 1, eu nunca terei 2 conexões abertas
+            facilitando assim abertura e fechamento de conexão*/
+            services.AddScoped<DataContext, DataContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
