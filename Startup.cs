@@ -23,7 +23,11 @@ namespace webapi
             services.AddControllers();
             //informara a aplicação que eu tenho um DataContext
             // e posso informar o banco que eu vou utilizar => postgres, mysqlServer etc
-            services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
+
+            //usando em memoria
+            //services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
+            services.AddDbContext<DataContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionString")));
+
             /*tornar esse DataContext disponivel aos nossos controllers
             injeção de dependencia
             O AddScoped irá garantir que irei ter somente 1 DataContext por requisição
