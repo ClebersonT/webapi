@@ -1,9 +1,12 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using webapi.Data;
 
 namespace webapi
@@ -21,6 +24,25 @@ namespace webapi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            //gerar uma chave simétrica, gera em um formato de bytes
+            var key = Encoding.ASCII.GetBytes(Settings.Secret);
+            services.AddAuthentication(x => {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            }).AddJwtBearer(x => {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters{
+                    //irá validar se tem uma key
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+             
             //informara a aplicação que eu tenho um DataContext
             // e posso informar o banco que eu vou utilizar => postgres, mysqlServer etc
 
@@ -52,6 +74,11 @@ namespace webapi
             //roteamento
             app.UseRouting();
             
+            //adicionado após a configuração do token
+            //que user é
+            app.UseAuthentication();
+
+            //o que o user irá poder fazer na aplicação
             app.UseAuthorization();
             //url, como o cliente irá acessar
             app.UseEndpoints(endpoints =>
