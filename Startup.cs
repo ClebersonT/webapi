@@ -26,7 +26,7 @@ namespace webapi
 
             //usando em memoria
             //services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
-            services.AddDbContext<DataContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionString")));
+            services.AddDbContext<DataContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionStrings")));
 
             /*tornar esse DataContext disponivel aos nossos controllers
             injeção de dependencia
