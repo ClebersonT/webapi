@@ -1,7 +1,9 @@
+using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +25,14 @@ namespace webapi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //comprimir tudo que for application/json
+            //antes de mandar pra tela, um html por exemplo tem a habilidade de descompactar isso
+            services.AddResponseCompression(options =>{
+                options.Providers.Add<GzipCompressionProvider>();
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json"});
+            });
+            //adiciona por padrão o cabeçalho de cache na aplicação toda!
+            //services.AddResponseCaching();
             services.AddControllers();
 
             //gerar uma chave simétrica, gera em um formato de bytes

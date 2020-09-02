@@ -11,7 +11,7 @@ using webapi.Models;
 //https://localhost:5001
 //http://localhost:5000
 namespace webapi.Controllers{
-    [Route("categories")]
+    [Route("v1/categories")]
 
     //Foi incluido os Tasks apartir da versão 6, para tra balhar de forma assincrona
     //não trava a thread principal da aplicação
@@ -25,6 +25,9 @@ namespace webapi.Controllers{
         //ActionResult => traz o resultado no formato que a tela espera
         //async => basicamente cria threads paralelas para a execução, não travando assim a aplicação
         //O Task pode receber uma tipagem, no caso foi o tipo Category
+        [ResponseCache(VaryByHeader = "User-Agent", Location = ResponseCacheLocation.Any, Duration = 30)]
+        //desabilita cache
+        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)];
         public async Task<ActionResult<List<Category>>> Get([FromServices]DataContext context){
             //AsNoTracking => realiza uma leitura mais rápida possível e "joga" na tela
             //toda vez que executamos um .ToList ele executa a query, então toda e qualquer query terá que vir antes do .ToListAsync
