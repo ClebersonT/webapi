@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webapi.Data;
@@ -20,6 +21,7 @@ namespace webapi.Controllers{
         //por padrão se eu não espor o verbo, automaticamente ele é do tipo get
         [HttpGet]
         [Route("")]
+        [AllowAnonymous]
         //ActionResult => traz o resultado no formato que a tela espera
         //async => basicamente cria threads paralelas para a execução, não travando assim a aplicação
         //O Task pode receber uma tipagem, no caso foi o tipo Category
@@ -34,6 +36,7 @@ namespace webapi.Controllers{
         //tudo que entra com chaves é encarado como parâmetro
         //:int => estou restringindo o que esta entrando como parametro, nesse caso se entrar um string, a api trará um 404 ao invés de buscar o solicitado
         [Route("{id:int}")]
+        [AllowAnonymous]
         //para passar para o metodo é so criar um parâmetro
         public async Task<ActionResult<Category>> GetById(int id, [FromServices]DataContext context){
         var category = await context.Categories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
@@ -42,6 +45,8 @@ namespace webapi.Controllers{
         
         [HttpPost]
         [Route("")]
+        //funcíonarios
+        [Authorize(Roles = "employeed")]
         public async Task<ActionResult<List<Category>>> Post([FromBody]Category model, [FromServices]DataContext context){
 
             //verificando se as validações que foram passadas no model estão de acordo
@@ -62,6 +67,8 @@ namespace webapi.Controllers{
 
         [HttpPut]
         [Route("{id:int}")]
+        //funcíonarios
+        [Authorize(Roles = "employeed")]
         public async Task<ActionResult<List<Category>>> Put(int id, [FromBody] Category model, [FromServices]DataContext context){
             //verifica se Id informado é o mesmo do modelo
             if (id != model.Id)
@@ -88,6 +95,8 @@ namespace webapi.Controllers{
 
         [HttpDelete]
         [Route("{id:int}")]
+        //funcíonarios
+        [Authorize(Roles = "employeed")]
         public async Task<ActionResult<List<Category>>> Delete(int id, [FromServices]DataContext context){
             /*FirstOrDefaultAsync           => Busca uma categoria dada uma expressão
             caso ache mais de uma categoria => ele pega a primeira
